@@ -14,10 +14,10 @@ import cv2
 
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_FROZEN_GRAPH = 'tuned_models/frozen_inference_graph.pb'
+PATH_TO_FROZEN_GRAPH = 'trained_model/frozen_inference_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = 'label_map.pbtxt'
+PATH_TO_LABELS = 'trained_model/label_map.pbtxt'
 
 # Load frozen Tensorflow model into memory
 detection_graph = tf.Graph()
@@ -82,9 +82,9 @@ capture = cv2.VideoCapture(0)
 
 while True:
   ret, image_np = capture.read()
-
-  # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-  image_np_expanded = np.expand_dims(image_np, axis=0)
+  if not capture.isOpened():
+    print "Can't open camera."
+    break
 
   # Actual detection.
   output_dict = run_inference_for_single_image(image_np, detection_graph)
@@ -99,7 +99,7 @@ while True:
       instance_masks=output_dict.get('detection_masks'),
       use_normalized_coordinates=True,
       line_thickness=8,
-      min_score_thresh=0.2
+      min_score_thresh=0.3
       )
 
   cv2.imshow('Rock Detection Live Feed', cv2.resize(image_np, (800, 600)))
